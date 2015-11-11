@@ -166,6 +166,9 @@ void rsp::RagnarStatePublisher::updateJointPosition(const sensor_msgs::JointStat
   // EE link
   ee_link.setIdentity();
   calculateEELinkTransform(pts.C,ee_link);
+  tf::Vector3 o = ee_link.getOrigin();
+  o.setY(o.getY() + 0.01);
+  ee_link.setOrigin(o);
   tf_broadcaster_.sendTransform(tf::StampedTransform(ee_link,
                                                      joints->header.stamp,
                                                      "base_link",

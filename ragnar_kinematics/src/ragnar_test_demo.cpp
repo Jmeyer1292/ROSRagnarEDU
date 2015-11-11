@@ -3,7 +3,8 @@
 #include <ros/ros.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <visualization_msgs/MarkerArray.h>
-#include <sensor_msgs/JointState.h>
+// #include <sensor_msgs/JointState.h>
+#include <trajectory_msgs/JointTrajectory.h>
 
 geometry_msgs::Point fromVec(const Eigen::Vector3d& v)
 {
@@ -92,7 +93,7 @@ int main(int argc, char** argv)
   ros::NodeHandle nh;
 
   ros::Publisher pose_pub = nh.advertise<visualization_msgs::MarkerArray>("ragnar_pose", 1);
-  ros::Publisher joint_pub = nh.advertise<sensor_msgs::JointState>("joint_states", 1);
+  ros::Publisher joint_pub = nh.advertise<trajectory_msgs::JointTrajectory>("joint_command", 1);
 
   // Debug print
   debugParams();
@@ -183,13 +184,19 @@ int main(int argc, char** argv)
       pose_pub.publish(array);
 
 
-      sensor_msgs::JointState js;
+      trajectory_msgs::JointTrajectory js;
       js.header.frame_id= "base_link";
       js.header.stamp = ros::Time::now();
-      js.position.assign(joints, joints+4);
+
+      trajectory_msgs::JointTrajectoryPoint pt;
+      pt.positions.assign(joints, joints+4);
+      pt.time_from_start = ros::Duration(2.0);
+
+      js.points.push_back(pt);
 
       joint_pub.publish(js);
 
+      ROS_INFO("Calculated IK:\n%f %f %f %f", joints[0], joints[1], joints[2], joints[3]);
       ROS_INFO_STREAM("A:\n" << pts.A << "\nB:\n" << pts.B << "\nC:\n" << pts.C << "\n");
     }
     else if (action == std::string("circle"))
