@@ -22,6 +22,7 @@ include_directories(
 add_library(ragnar_kinematics
  src/ragnar_kinematic_defs.cpp
  src/ragnar_kinematics.cpp
+ src/ragnar_planning.cpp
 )
 
 target_link_libraries(ragnar_kinematics
